@@ -7,11 +7,25 @@ def emotion_detector(text_to_analyze):
     
     try:
         response = requests.post(url, headers=headers, json=input_json)
-        data = response.json()  
+        data = response.json()  # Parse the JSON response
         
+        # Extract emotions from the response
         if response.status_code == 200 and 'emotionPredictions' in data:
             emotions = data['emotionPredictions'][0]['emotion']
-            return emotions
+            
+            # Find the dominant emotion
+            dominant_emotion = max(emotions, key=emotions.get)
+            
+            # Format the output
+            result = {
+                'anger': emotions.get('anger', 0),
+                'disgust': emotions.get('disgust', 0),
+                'fear': emotions.get('fear', 0),
+                'joy': emotions.get('joy', 0),
+                'sadness': emotions.get('sadness', 0),
+                'dominant_emotion': dominant_emotion
+            }
+            return result
         else:
             return f"Unexpected response structure: {data}"
     except requests.exceptions.RequestException as e:
